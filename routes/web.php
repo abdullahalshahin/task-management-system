@@ -14,13 +14,20 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-    
-Route::get('/', function () {
-    return view('welcome');
-});
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+// ----------------------- public page route section ----------------------- //
+Route::get('/', [PublicPageController::class, 'index']);
+
+Route::middleware('auth')->group(function() {
+    Route::prefix('admin-panel/dashboard')->group(function() {
+        Route::get('/', [DashboardController::class, 'index']);
+
+        Route::resource('tasks', TaskController::class);
+        Route::resource('to-dos', ToDoController::class);
+
+        Route::get('mark-as-completed/{task}', [TaskController::class, 'mark_as_completed']);
+        Route::get('tasks-all-delete', [TaskController::class, 'all_delete']);
+    });
+});
 
 require __DIR__.'/auth.php';
